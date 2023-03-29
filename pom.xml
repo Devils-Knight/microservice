@@ -12,7 +12,7 @@
         <module>configserver</module>
         <module>licenseservice</module>
         <module>eurekaserver</module>
-        <module>organization-service</module>
+        <module>organizationservice</module>
     </modules>
 
     <properties>

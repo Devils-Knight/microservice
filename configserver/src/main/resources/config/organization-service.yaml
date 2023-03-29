@@ -4,8 +4,17 @@ management:
   endpoints:
     web:
       exposure:
-        include: *
+        include: "*"
     enabled-by-default: true
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 2000
+      maximum-pool-size: 5
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
 eureka:
   instance:
     prefer-ip-address: true
@@ -13,4 +22,4 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      default-zone: http://eureka-server:8070/eureka/
+      defaultZone: http://localhost:8070/eureka/
