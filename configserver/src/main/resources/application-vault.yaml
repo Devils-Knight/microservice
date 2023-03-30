@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    config:
+      server:
+        vault:
+          host: localhost
+          port: 8200
+          authentication: token
+          token: root
+          kv-version: 2
+          backend: microservice

@@ -73,3 +73,20 @@ INSERT INTO public.licenses
 VALUES ('279709ff-e6d5-4a54-8b55-a5c37542025b', 'e839ee96-28de-4f67-bb79-870ca89743a0', 'Software Product', 'Ostock',
         'complete', 'I AM DEV');
 ```
+
+## 2.2 Vault
+
+The `docker-compose.yaml` of Vault is as follows:
+
+```yaml
+version: "3.9"
+
+services:
+  vault:
+    container_name: vault
+    image: hashicorp/vault:1.13
+    ports:
+      - "8200:8200"
+    environment:
+      - "VAULT_DEV_ROOT_TOKEN_ID=root"
+```

@@ -2,24 +2,45 @@ package com.autmaple.service;
 
 import com.autmaple.config.ServiceConfig;
 import com.autmaple.model.License;
+import com.autmaple.model.Organization;
+import com.autmaple.repository.LicenseRepository;
+import com.autmaple.service.client.OrganizationFeignClient;
+import com.autmaple.utils.UserContextHolder;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
-import com.autmaple.repository.LicenseRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LicenseService {
     private final LicenseRepository licenseRepository;
     private final MessageSource messages;
     private final ServiceConfig config;
+    private final OrganizationFeignClient organizationClient;
 
     public License getLicense(String organizationId, String licenseId) {
         License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
         if (null == license) {
             throw new IllegalArgumentException(String.format(messages.getMessage("license.search.error.message", null, null), licenseId, organizationId));
+        }
+        Organization organization = organizationClient.getOrganization(organizationId);
+        if (null != organization) {
+            license.setOrganizationName(organization.getName());
+            license.setContactName(organization.getContactName());
+            license.setContactEmail(organization.getContactEmail());
+            license.setContactPhone(organization.getContactPhone());
         }
         return license.withComment(config.getProperty());
     }
@@ -27,11 +48,6 @@ public class LicenseService {
     public License updateLicense(License license) {
         licenseRepository.save(license);
         return license.withComment(config.getProperty());
-    }
-
-    // todo waiting for completing
-    public License getLicense(String licenseId, String organizationId, String clientType) {
-        return null;
     }
 
     public License createLicense(License license) {
@@ -45,5 +61,43 @@ public class LicenseService {
         license.setLicenseId(licenseId);
         licenseRepository.delete(license);
         return String.format(messages.getMessage("license.delete.message", null, null), licenseId);
+    }
+
+    @CircuitBreaker(name = "license-service", fallbackMethod = "buildFallbackLicenseList")
+    @RateLimiter(name = "license-service", fallbackMethod = "buildFallbackLicenseList")
+    @Retry(name = "license-service", fallbackMethod = "buildFallbackLicenseList")
+    @Bulkhead(name = "license-service", type = Bulkhead.Type.THREADPOOL, fallbackMethod = "buildFallbackLicenseList")
+    public List<License> getLicenseByOrganization(String organizationId) throws TimeoutException {
+        System.out.println("hahah");
+        log.debug("getLicenseByOrganization Correlation id: {}", UserContextHolder.getUserContext().getCorrelationId());
+        randomlyRunLog();
+        return licenseRepository.findByOrganizationId(organizationId);
+    }
+
+    private List<License> buildFallbackLicenseList(String organizationId, Throwable t) {
+        log.error("Circuit Breaker is working.");
+        List<License> fallbackList = new ArrayList<>();
+        License license = new License();
+        license.setLicenseId("00000000-00-00000");
+        license.setOrganizationId(organizationId);
+        license.setProductName("Sorry no licensing information currently available.");
+        fallbackList.add(license);
+        return fallbackList;
+    }
+
+    private void randomlyRunLog() throws TimeoutException {
+        Random random = new Random();
+        int randomNum = random.nextInt(3) + 1;
+        if (randomNum == 3) sleep();
+    }
+
+    private void sleep() throws TimeoutException {
+        System.out.println("Sleep");
+        try {
+            Thread.sleep(5000);
+            throw new TimeoutException();
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
     }
 }

@@ -1,13 +1,9 @@
 spring:
-  profiles:
-    active: native
   application:
     name: config-server
-  cloud:
-    config:
-      server:
-        native:
-          search-locations: classpath:/config
+  profiles:
+    active: vault
+
 server:
   port: 8071
 management:
@@ -15,3 +11,5 @@ management:
     web:
       exposure:
         include: "*"
+encrypt:
+  key: aaaaaa

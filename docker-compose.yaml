@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  vault:
+    container_name: vault
+    image: vault:1.13.0
+    ports:
+      - "8200:8200"
+    environment:
+      - "VAULT_DEV_ROOT_TOKEN_ID=myroot"
+    volumes:
+      - "${PWD}/config:/vault/config"
+      - "${PWD}/logs:/vault/logs"
+      - "${PWD}/file:/vault/file"

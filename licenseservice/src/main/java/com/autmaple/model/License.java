@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Getter
 @Setter
@@ -28,6 +29,14 @@ public class License extends RepresentationModel<License> {
     private String licenseType;
     @Column(name = "comment", nullable = false)
     private String comment;
+    @Transient
+    private String organizationName;
+    @Transient
+    private String contactName;
+    @Transient
+    private String contactEmail;
+    @Transient
+    private String contactPhone;
 
     public License withComment(String comment) {
         this.setComment(comment);
