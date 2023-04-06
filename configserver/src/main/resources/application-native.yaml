@@ -4,3 +4,4 @@ spring:
       server:
         native:
           search-locations: classpath:/config
+          order: 2

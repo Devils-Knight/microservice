@@ -9,3 +9,4 @@ spring:
           token: root
           kv-version: 2
           backend: microservice
+          order: 1

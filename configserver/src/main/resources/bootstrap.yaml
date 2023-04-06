@@ -2,7 +2,7 @@ spring:
   application:
     name: config-server
   profiles:
-    active: vault
+    active: native
 
 server:
   port: 8071

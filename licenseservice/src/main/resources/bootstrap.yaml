@@ -1,57 +1,51 @@
 spring:
   application:
     name: license-service
-  profiles:
-    active: dev
   cloud:
     config:
       uri: http://localhost:8071
 
-resilience4j.circuitbreaker:
-  instances:
-    licenseService:
-      registerHealthIndicator: true
-      ringBufferSizeInClosedState: 5
-      ringBufferSizeInHalfOpenState: 3
-      waitDurationInOpenState: 10s
-      failureRateThreshold: 50
-      recordExceptions:
-        - org.springframework.web.client.HttpServerErrorException
-        - java.io.IOException
-        - java.util.concurrent.TimeoutException
-        - org.springframework.web.client.ResourceAccessException
-    organizationService:
-      registerHealthIndicator: true
-      ringBufferSizeInClosedState: 6
-      ringBufferSizeInHalfOpenState: 4
-      waitDurationInOpenState: 20s
-      failureRateThreshold: 60
+resilience4j:
+  circuitbreaker:
+    instances:
+      licenseService:
+        register-health-indicator: true
+        sliding-window-size: 5
+        permitted-number-of-calls-in-half-open-state: 1
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+        record-exceptions:
+          - org.springframework.web.client.HttpServerErrorException
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.client.ResourceAccessException
 
-resilience4j.ratelimiter:
-  instances:
-    licenseService:
-      limitForPeriod: 5
-      limitRefreshPeriod: 5000
-      timeoutDuration: 1000ms
-
-resilience4j.retry:
-  instances:
-    retryLicenseService:
-      maxRetryAttempts: 5
-      waitDuration: 10000
-      retry-exceptions:
-        - java.util.concurrent.TimeoutException
-
-resilience4j.bulkhead:
-  instances:
-    bulkheadLicenseService:
-      maxWaitDuration: 2ms
-      maxConcurrentCalls: 20
+  bulkhead: # 信号量类型配置的参数
+    instances:
+      licenseService:
+        max-concurrent-calls: 1
+        max-wait-duration: 100ms
 
 
-resilience4j.thread-pool-bulkhead:
-  instances:
-    bulkheadLicenseService:
-      maxThreadPoolSize: 1
-      coreThreadPoolSize: 1
-      queueCapacity: 1
+  thread-pool-bulkhead: # 线程池方式配置的参数
+    instances:
+      bulkheadLicenseService:
+        max-thread-pool-size: 1
+        core-thread-pool-size: 1
+        queue-capacity: 1
+        keep-alive-duration: 60000ms
+  retry:
+    instances:
+      licenseService:
+        max-attempts: 3
+        wait-duration: 1000ms
+        retry-exceptions: # 如果程序遇到如下的异常会进行重试
+          - java.lang.Exception
+
+  ratelimiter:
+    instances:
+      licenseService:
+        register-health-indicator: true
+        timeout-duration: 100ms
+        limit-refresh-period: 1s
+        limit-for-period: 1
