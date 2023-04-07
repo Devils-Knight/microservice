@@ -13,6 +13,7 @@
         <module>licenseservice</module>
         <module>eurekaserver</module>
         <module>organizationservice</module>
+        <module>gateway</module>
     </modules>
 
     <properties>
