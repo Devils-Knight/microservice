@@ -16,7 +16,12 @@ spring:
             - Path=/organization/**
           filters:
             - RewritePath=/organization/(?<path>.*), /$\{path}
-
+        - id: license-service
+          uri: lb://license-service
+          predicates:
+            - Path=/license/**
+          filters:
+            - RewritePath=/license/(?<path>.*), /$\{path}
 eureka:
   instance:
     prefer-ip-address: true
@@ -25,3 +30,13 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:8070/eureka
+server:
+  port: 8072
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+logging:
+  level:
+    com.netflix: warn
