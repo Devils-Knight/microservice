@@ -1,0 +1,40 @@
+server:
+  port: 9002
+  #keycloak:
+  #  realm: ostock
+  #  auth-server-url: http://localhost:10000
+  #  ssl-required: external
+  #  resource: ostock
+  #  credentials:
+  #    secret: 1ahXcWZqcHtW4wRY6ENCfgEKlpOQCCeZ
+  #  verify-token-audience: false
+  #  use-resource-role-mappings: true
+#  public-client: true
+#  principal-attribute: preferred_name
+#  security-constraints:
+#    - auth-roles:
+#        - user
+#        - admin
+#    - security-collections:
+#        - patterns:
+#            - "/*"
+#  public-client: true
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ostock
+            client-secret: 1ahXcWZqcHtW4wRY6ENCfgEKlpOQCCeZ
+            scope: openid
+            provider: keycloak
+        provider:
+          keycloak:
+            issuer-uri: "http://localhost:10000/realms/ostock"
+            user-name-attribute: preferred_username
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:10000/realms/ostock
+  main:
+    allow-circular-references: true

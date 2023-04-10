@@ -4,14 +4,8 @@ spring:
   cloud:
     config:
       uri: http://localhost:8071
-  main:
-    allow-circular-references: true
-keycloak:
-  realm: ostock
-  auth-server-url: http://localhost:10000
-  ssl-required: external
-  resource: organization-service
-  credentials:
-    secret: CyxwHGbe8Xt8n7AVbQEIXsG35BtiCtcR
-  use-resource-role-mappings: false
-  bearer-only: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:10000/realms/ostock
