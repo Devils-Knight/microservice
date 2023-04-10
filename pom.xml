@@ -55,6 +55,11 @@
                 <artifactId>resilience4j-spring-boot2</artifactId>
                 <version>${resilience.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-spring-boot-starter</artifactId>
+                <version>21.0.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

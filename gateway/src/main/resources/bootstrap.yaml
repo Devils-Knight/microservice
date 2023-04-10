@@ -22,6 +22,22 @@ spring:
             - Path=/license/**
           filters:
             - RewritePath=/license/(?<path>.*), /$\{path}
+  security:
+    oauth2:
+      client:
+        provider:
+          organization-service:
+            issuer-uri: http://localhost:10000/realms/ostock
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            provider: organization-service
+            client-id: organization-service
+            client-secret: CyxwHGbe8Xt8n7AVbQEIXsG35BtiCtcR
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+  main:
+    web-application-type: reactive
 eureka:
   instance:
     prefer-ip-address: true
@@ -40,3 +56,4 @@ management:
 logging:
   level:
     com.netflix: warn
+

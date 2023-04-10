@@ -90,3 +90,42 @@ services:
     environment:
       - "VAULT_DEV_ROOT_TOKEN_ID=root"
 ```
+
+## 2.3 keycloak
+
+```yaml
+version: "3.9"
+
+services:
+  keycloak:
+    container_name: keycloak
+    image: bitnami/keycloak:21.0.2-debian-11-r2
+    ports:
+      - "10000:8080"
+    environment:
+      - "KEYCLOAK_ADMIN_USER=admin"
+      - "KEYCLOAK_ADMIN_PASSWORD=admin"
+      - "KEYCLOAK_MANAGEMENT_USER=admin"
+      - "KEYCLOAK_MANAGEMENT_PASSWORD=admin"
+      - "KEYCLOAK_DATABASE_VENDOR=dev-file"
+```
+
+### What's the client in Keycloak?
+
+Clients in Keycloak are entities that can request user authentication. The clients are often the applications or services that we want to secure by providing a single sign-on (SSO) solution.
+
+
+### Testing the client
+
+To confirm the client was created successfully, you can use the SPA testing application on the [Keycloak website](https://www.keycloak.org/app/)
+
+### Inspect endpoints
+
+The endpoints located in the `Realm Setting` menu.
+
+### Reference Document
+
+- [Spring Boot Configuration](https://www.keycloak.org/docs/latest/securing_apps/index.html#_spring_boot_adapter)
+- [Spring Boot Integration](https://www.keycloak.org/docs/latest/securing_apps/index.html#spring-boot-integration)
+- [Java Adapter Configurations](https://www.keycloak.org/docs/latest/securing_apps/index.html#_java_adapter_config)
+- [Server Administration Guide](https://keycloak.org/docs/latest/server_admin/)
