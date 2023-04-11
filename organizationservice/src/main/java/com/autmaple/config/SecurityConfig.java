@@ -1,51 +1,85 @@
-//package com.autmaple.config;
+package com.autmaple.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+//@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverterForKeycloak() {
+        Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = jwt -> {
+            Map<String, Collection<String>> realmAccess = jwt.getClaim("realm_access");
+            Collection<String> roles = realmAccess.get("roles");
+            return roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .collect(Collectors.toList());
+        };
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+
+        return jwtAuthenticationConverter;
+    }
+
+
+//    @Override
+//    protected AccessDecisionManager accessDecisionManager() {
+//        RoleVoter roleVoter = new RoleVoter();
+//        roleVoter.setRolePrefix("");
+//        List<AccessDecisionVoter<?>> decisionVoters = Arrays.asList(roleVoter, new AuthenticatedVoter());
+//        return new AffirmativeBased(decisionVoters);
+//    }
+
+//    @Bean
+//    public RoleVoter roleVoter() {
+//        RoleVoter roleVoter = new RoleVoter();
+//        roleVoter.setRolePrefix("");
+//        return roleVoter;
+//    }
+
+//    @Bean
+//    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
+//        return authorities -> authorities.stream()
+//                .map(this::removeROLE_Prefix)
+//                .collect(Collectors.toList());
+//    }
 //
-//import org.keycloak.adapters.KeycloakConfigResolver;
-//import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
-//import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
-//import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-//import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
-//import org.springframework.security.core.session.SessionRegistryImpl;
-//import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-//import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+//    public GrantedAuthority removeROLE_Prefix(GrantedAuthority authority) {
+//        String role = authority.getAuthority();
+//        if (role.startsWith("ROLE_")) {
+//            role = role.substring(5);
+//        }
+//        return new SimpleGrantedAuthority(role);
+//    }
 //
-////@EnableWebSecurity
-////@Configuration
-////@EnableGlobalMethodSecurity(jsr250Enabled = true)
-//public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
-////
-////
-////    @Override
-////    protected void configure(HttpSecurity http) throws Exception {
-////        super.configure(http);
-////        http.authorizeRequests()
-////                .anyRequest().authenticated();
-////        http.csrf().disable();
-////    }
-////
-////
-////    @Bean
-////    @Override
-////    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-////        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
-////    }
-////
-////    @Bean
-////    public KeycloakConfigResolver keycloakConfigResolver() {
-////        return new KeycloakSpringBootConfigResolver();
-////    }
-////
-////    @Autowired
-////    public void configureGlobal(AuthenticationManagerBuilder builder) {
-////        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
-////        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
-////        builder.authenticationProvider(keycloakAuthenticationProvider);
-////    }
-//}
+//    @Bean
+//    public JwtAuthenticationConverter jwtAuthenticationConverterForKeycloak() {
+//        Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = jwt -> {
+//            Map<String, Collection<String>> realmAccess = jwt.getClaim("realm_access");
+//            Collection<String> roles = realmAccess.get("roles");
+//            return roles.stream()
+//                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+//                    .collect(Collectors.toList());
+//        };
+//
+//        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+//        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//
+//        return jwtAuthenticationConverter;
+//    }
+
+//    @Bean
+//    public JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter() {
+//        JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+//        converter.setAuthorityPrefix("");
+//        return converter;
+//    }
+}
